@@ -8,6 +8,13 @@
 
 ---
 
+## 🌐 線上網頁版展示 (Live Demo on GitHub Pages)
+
+- **GitHub Pages 專屬網址**：**[https://yb-802.github.io/HW1-Taiwan-Weather/](https://yb-802.github.io/HW1-Taiwan-Weather/)**
+  - 免安裝任何 Python 環境，使用瀏覽器即可直接體驗全功能互動式台灣天氣地圖、雙溫折線圖、預報數據表與 AI 生活穿搭顧問！
+
+---
+
 ## 🌟 核心特色功能
 
 1. **中央氣象署 CWA Open Data 串接**：
@@ -36,7 +43,10 @@
 
 ```text
 HW1-Taiwan-Weather/
-├── app.py              # Streamlit 核心應用程式與儀表板前端
+├── index.html          # GitHub Pages 線上網頁版首頁 (純 HTML5)
+├── style.css           # 現代化響應式深藍科技感風格樣式表 (純 CSS3)
+├── app.js              # 前端互動邏輯 (Leaflet 台灣地圖、Chart.js 折線圖、AI 運算)
+├── app.py              # Streamlit 核心 Python Web 應用程式
 ├── cwa_api.py          # CWA API 串接、JSON 解析與擬真資料產生模組
 ├── database.py         # SQLite (data.db) 資料庫初始化、寫入與 SQL 查詢
 ├── data.db             # SQLite 資料庫檔案 (已內建初始氣候資料)

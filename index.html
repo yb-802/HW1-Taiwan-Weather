@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taiwan Weather Forecast | 台灣天氣預報系統</title>
+  <meta name="description" content="從氣象資料到互動式天氣預報應用 - 整合中央氣象署 CWA API、互動地圖視覺化與智慧穿搭生活指南。">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for Taiwan Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Top Hero Banner -->
+    <header class="hero-banner">
+      <div class="hero-header">
+        <div class="hero-title-group">
+          <span class="hero-icon">🌤️</span>
+          <div>
+            <h1 class="hero-title">Taiwan Weather Forecast</h1>
+            <p class="hero-subtitle">從氣象資料到互動式天氣預報應用 | 用程式探索天氣，用資料看見台灣，用 AI 實現更多可能</p>
+          </div>
+        </div>
+        <a href="https://github.com/yb-802/HW1-Taiwan-Weather" target="_blank" rel="noopener noreferrer" class="github-link-btn" id="githubRepoLink">
+          <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+          </svg>
+          GitHub 儲存庫
+        </a>
+      </div>
+
+      <div class="hero-badges">
+        <span class="badge">⚡ CWA API</span>
+        <span class="badge">📦 JSON Parsing</span>
+        <span class="badge">🗺️ Leaflet Map</span>
+        <span class="badge">📈 Chart.js</span>
+        <span class="badge">🤖 AI Life Advisor</span>
+        <span class="badge">🌐 GitHub Pages</span>
+      </div>
+    </header>
+
+    <!-- Controls & Selection Bar -->
+    <section class="control-bar" aria-label="查詢控制台">
+      <div class="control-item">
+        <label for="regionSelect" class="control-label">📍 選擇地區 (Select Region)</label>
+        <select id="regionSelect" class="form-select">
+          <option value="北部地區">北部地區</option>
+          <option value="中部地區">中部地區</option>
+          <option value="南部地區">南部地區</option>
+          <option value="東北部地區">東北部地區</option>
+          <option value="東部地區">東部地區</option>
+          <option value="東南部地區">東南部地區</option>
+        </select>
+      </div>
+
+      <div class="control-item">
+        <label for="dateSelect" class="control-label">📅 選擇日期 (Select Date)</label>
+        <select id="dateSelect" class="form-select">
+          <!-- Populated dynamically by app.js -->
+        </select>
+      </div>
+
+      <div class="control-item">
+        <label for="apiKeyInput" class="control-label">🔑 CWA 授權碼 (可選)</label>
+        <input type="text" id="apiKeyInput" class="form-input" placeholder="例如: CWA-XXXXXXXX-XXXX" />
+      </div>
+
+      <div class="control-item" style="display:flex; flex-direction:row; gap:0.5rem;">
+        <button id="btnFetchCWA" class="btn-primary" title="連線中央氣象署 API 更新">
+          🔄 同步 API
+        </button>
+        <button id="btnResetMock" class="btn-secondary" title="隨機產生最新 7 天氣象資料">
+          🎲 示範數據
+        </button>
+      </div>
+    </section>
+
+    <!-- KPI Metric Cards -->
+    <section class="kpi-grid" aria-label="氣溫關鍵指標">
+      <div class="kpi-card">
+        <div class="kpi-title">最低氣溫 (MinT)</div>
+        <div class="kpi-value" id="kpiMinT" style="color: #2563EB;">-- °C</div>
+        <div class="kpi-footer">所選地區今日預估</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">最高氣溫 (MaxT)</div>
+        <div class="kpi-value" id="kpiMaxT" style="color: #EF4444;">-- °C</div>
+        <div class="kpi-footer">所選地區今日預估</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">平均氣溫 (AvgT)</div>
+        <div class="kpi-value" id="kpiAvgT">-- °C</div>
+        <div class="kpi-footer">當日預估均溫</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">日夜溫差</div>
+        <div class="kpi-value" id="kpiDiff">-- °C</div>
+        <div class="kpi-footer">高低溫跨度</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">全台最高溫分佈</div>
+        <div class="kpi-value" id="kpiHottest" style="font-size: 1.35rem; color: #DC2626;">--</div>
+        <div class="kpi-footer">全台最熱區域</div>
+      </div>
+    </section>
+
+    <!-- Visuals Grid: Map & Chart -->
+    <main class="visuals-grid">
+      <!-- Taiwan Interactive Map -->
+      <section class="panel-card" aria-label="台灣地圖視覺化">
+        <div class="panel-header">
+          <h2 class="panel-title">🗺️ 台灣地圖視覺化</h2>
+          <p class="panel-subtitle">全台 6 大區域即時溫標著色（點擊地圖圓點可查看詳細預報）</p>
+          <div class="map-legend">
+            <span class="legend-pill pill-cold">🔵 &lt; 20°C 偏涼</span>
+            <span class="legend-pill pill-comf">🟢 20-25°C 舒適</span>
+            <span class="legend-pill pill-warm">🟠 25-30°C 溫暖</span>
+            <span class="legend-pill pill-hot">🔴 &gt; 30°C 炎熱</span>
+          </div>
+        </div>
+        <div id="taiwanMap"></div>
+      </section>
+
+      <!-- Line Chart -->
+      <section class="panel-card" aria-label="氣溫趨勢折線圖">
+        <div class="panel-header">
+          <h2 class="panel-title" id="chartRegionTitle">📈 北部地區 一週最高與最低氣溫</h2>
+          <p class="panel-subtitle">紅色代表最高氣溫 (MaxT)，藍色代表最低氣溫 (MinT)</p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="temperatureChart"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <!-- Secondary Row: Table & AI Assistant -->
+    <section class="secondary-grid">
+      <!-- Data Table -->
+      <div class="panel-card">
+        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+          <div>
+            <h2 class="panel-title" id="tableRegionTitle">📋 北部地區 預報詳細數據表</h2>
+            <p class="panel-subtitle">格式化呈現一週氣候指標</p>
+          </div>
+          <button id="btnExportCSV" class="btn-secondary" style="margin-top:0.3rem;">
+            📥 下載 CSV
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="custom-table" id="forecastTable">
+            <thead>
+              <tr>
+                <th>預報日期</th>
+                <th>最低溫 (MinT)</th>
+                <th>最高溫 (MaxT)</th>
+                <th>平均溫 (AvgT)</th>
+                <th>溫差</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI Smart Assistant -->
+      <div class="panel-card">
+        <div class="ai-advisor-box">
+          <div class="ai-header">
+            <span class="ai-icon">🤖</span>
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <h3 style="margin:0; font-size:1.15rem; color:#1e3a8a;">AI 天氣生活顧問</h3>
+                <span class="ai-badge">SMART ENGINE</span>
+              </div>
+              <p style="margin:0; font-size:0.8rem; color:#64748b;" id="aiRegionTitle">智慧生活提醒</p>
+            </div>
+          </div>
+
+          <div class="ai-item">
+            <div class="ai-item-title">👔 穿搭指南</div>
+            <div class="ai-item-content" id="aiClothing">分析中...</div>
+          </div>
+
+          <div class="ai-item">
+            <div class="ai-item-title">🚶 戶外出行與活動建議</div>
+            <div class="ai-item-content" id="aiActivity">分析中...</div>
+          </div>
+
+          <div class="ai-item">
+            <div class="ai-item-title">❤️ 健康防護與紫外線叮嚀</div>
+            <div class="ai-item-content" id="aiHealth">分析中...</div>
+          </div>
+
+          <div style="margin-top:auto; font-size:0.75rem; color:#64748b; padding-top:0.5rem;">
+            ⚡ 結合中央氣象署數值與智慧決策模型，為您的日常生活提供個人化氣象參考。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture & Features Box -->
+    <section class="accordion-box">
+      <h3 class="accordion-title">📚 專案核心架構與技術亮點</h3>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <h4>📡 開放資料 API</h4>
+          <p>整合交通部中央氣象署開放資料平台 (CWA Open Data)，支援即時 JSON 擷取與離線示範資料容錯機制。</p>
+        </div>
+        <div class="tech-item">
+          <h4>🗺️ 地理資訊視覺化</h4>
+          <p>整合 Leaflet 與 OpenStreetMap 台灣圖資，以動態溫標色階標註台灣 6 大區域並支援交互點擊彈窗。</p>
+        </div>
+        <div class="tech-item">
+          <h4>📈 雙軌氣溫趨勢曲線</h4>
+          <p>使用 Chart.js 繪製一週 MinT 與 MaxT 折線圖，具備平滑張力曲線與數值標記。</p>
+        </div>
+        <div class="tech-item">
+          <h4>🤖 AI 智慧生活決策</h4>
+          <p>根據即時溫差、均溫與高溫警示，動態運算個人化穿著建議、出遊指南與健康防護提示。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Taiwan Weather Forecast Web Application | Developed for IoT Course HW1</p>
+      <p style="margin-top: 0.35rem;">
+        原始碼已開源至 GitHub：<a href="https://github.com/yb-802/HW1-Taiwan-Weather" target="_blank" rel="noopener noreferrer">yb-802/HW1-Taiwan-Weather</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
