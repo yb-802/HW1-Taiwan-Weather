@@ -17,7 +17,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 import folium
-from streamlit_folium import st_folium
+import streamlit.components.v1 as components
+try:
+    from streamlit_folium import st_folium
+except Exception:
+    st_folium = None
 
 import database as db
 import cwa_api
@@ -317,7 +321,7 @@ with col_map:
     m = folium.Map(
         location=[23.75, 120.95],
         zoom_start=7,
-        tiles="CartoDB positron",
+        tiles="OpenStreetMap",
         control_scale=True
     )
 
@@ -365,7 +369,16 @@ with col_map:
             )
         ).add_to(m)
 
-    st_folium(m, width="100%", height=460, returned_objects=[])
+    # Render map using st_folium if available, otherwise fallback cleanly to standalone HTML
+    rendered = False
+    if st_folium is not None:
+        try:
+            st_folium(m, width="100%", height=460, returned_objects=[])
+            rendered = True
+        except Exception:
+            rendered = False
+    if not rendered:
+        components.html(m.get_root().render(), height=460)
 
 
 with col_chart:
