@@ -192,7 +192,7 @@ with st.sidebar:
             st.success("示範資料庫已重設！")
 
     st.markdown("---")
-    st.subheader("🎯 查詢條件 (Step 13 & 18)")
+    st.subheader("🎯 查詢條件")
     
     # Region selector
     available_regions = db.get_regions()
@@ -304,7 +304,7 @@ def get_temp_color(temp: float) -> str:
 
 
 with col_map:
-    st.subheader("🗺️ 進階：台灣地圖視覺化 (Step 17 & 18)")
+    st.subheader("🗺️ 台灣地圖視覺化")
     st.caption(f"📅 顯示日期：**{selected_date}** 全台 6 大區域氣象概況 (點擊地圖圓圈查看詳細資訊)")
 
     # Color Legend Badges
@@ -382,7 +382,7 @@ with col_map:
 
 
 with col_chart:
-    st.subheader(f"📈 {selected_region} 一週最高與最低氣溫 (Step 14 & 16)")
+    st.subheader(f"📈 {selected_region} 一週最高與最低氣溫")
     st.caption("紅色代表最高氣溫 (MaxT)，藍色代表最低氣溫 (MinT)")
 
     if not region_df.empty:
@@ -455,7 +455,7 @@ with col_chart:
 col_table, col_ai = st.columns([1.1, 1.1])
 
 with col_table:
-    st.subheader(f"📋 {selected_region} 預報詳細數據表 (Step 15)")
+    st.subheader(f"📋 {selected_region} 預報詳細數據表")
     st.caption("從 SQLite 資料庫 `data.db` 讀取並透過 Pandas 格式化顯示")
 
     if not region_df.empty:
@@ -486,7 +486,7 @@ with col_table:
 
 
 with col_ai:
-    st.subheader("🤖 AI 天氣顧問與生活提醒 (Step 22 延伸應用)")
+    st.subheader("🤖 AI 天氣顧問與生活提醒")
     st.caption("依據今日與一週預報溫差，智慧運算穿搭、出行與健康防護指南")
 
     # Generate smart recommendations based on current temperature metrics
@@ -524,37 +524,20 @@ with col_ai:
 
 
 # ---------------------------------------------------------
-# Footer: 24-step Curriculum Guide (海報全流程導覽)
+# Footer: Project Architecture Guide
 # ---------------------------------------------------------
 st.markdown("---")
-with st.expander("📚 查看《AI 創新微課程 Taiwan Weather Forecast》24 個實作步驟與核心架構", expanded=False):
+with st.expander("📚 查看專案核心架構與技術功能說明", expanded=False):
     st.markdown("""
-    本專案完整落實海報中的 24 個學習步驟：
+    **本專案技術架構與功能亮點：**
     
-    1. **課程介紹**：AI × 資料 × 天氣 × 實作完整學習地圖。
-    2. **台灣天氣與生活**：氣象資料驅動決策與生活應用。
-    3. **中央氣象署 CWA 平台**：註冊帳號、取得授權金鑰、選定氣象資料集。
-    4. **API 資料取得**：利用 `requests.get()` 取得遠端即時 JSON。
-    5. **JSON 資料結構解析**：定位 `locations`、`locationName` 與 `weatherElement`。
-    6. **提取最高與最低氣溫**：精準抽取 `MinT` 與 `MaxT` 溫度特徵。
-    7. **資料整理與預覽**：Pandas DataFrame 結構化處理。
-    8. **建立 SQLite 資料庫**：建立本地 `data.db` 儲存長期預報紀錄。
-    9. **資料庫設計**：`TemperatureForecasts` 表格，具備 `UNIQUE(regionName, dataDate)` 約束。
-    10. **查詢資料驗證**：SQL `SELECT DISTINCT` 驗證資料品質。
-    11. **Streamlit 入門**：快速建構現代化資料 Web 應用。
-    12. **從資料庫讀取資料**：透過 `pd.read_sql_query` 連線 SQLite。
-    13. **下拉選單選擇地區**：互動式 Region 下拉選單。
-    14. **繪製折線圖**：繪製一週最高溫 (紅) 與最低溫 (藍) 趨勢曲線。
-    15. **顯示資料表格**：清楚呈現一週氣溫數值，並提供 CSV 下載。
-    16. **整合 Web App 介面**：選地區即時聯動更新圖表與數據。
-    17. **進階：台灣地圖視覺化**：整合 Folium 依據平均氣溫著色標記（藍、綠、橘、紅）。
-    18. **選擇日期顯示地圖**：日期切換聯動地圖 Popup 資訊。
-    19. **完整成果展示**：Taiwan Weather Dashboard 全方位儀表板。
-    20. **程式碼品質與優化**：模組化架構、例外捕捉、重複執行不重複插入。
-    21. **專案上傳至 GitHub**：Git 版本控制、遠端儲存庫同步。
-    22. **延伸應用與想法**：AI 天氣穿搭指南、生活出遊建議。
-    23. **回顧與重點整理**：API → JSON → DB → Web App 全流程回顧。
-    24. **下一步：繼續探索**：AI 賦能 IoT 與大數據應用！
+    - **開放資料串接**：支援中央氣象署 CWA Open Data API 即時擷取與擬真資料離線支援。
+    - **資料結構解析**：定位 `locations`、`locationName` 與 `weatherElement` 精準提取氣溫數值。
+    - **SQLite 資料庫持久化**：本地 `data.db` 儲存長期預報紀錄，具備防重複插入與去重約束。
+    - **互動式前端儀表板**：Streamlit 現代化介面，即時切換地區與預報日期。
+    - **雙軌氣溫趨勢折線圖**：繪製一週最高溫 (紅) 與最低溫 (藍) 趨勢曲線與數值標註。
+    - **地理圖資視覺化**：整合 Folium 依據平均氣溫著色標記（藍、綠、橘、紅）與彈出詳情。
+    - **AI 智慧生活助手**：依據氣象數值動態推估穿搭指南、戶外出行與健康提醒。
     """)
 
 st.caption("✨ Developed with pair-programming assistance by Antigravity | Code Smarter, Build a Better Tomorrow!")
